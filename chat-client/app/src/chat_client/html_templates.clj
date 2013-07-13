@@ -14,6 +14,6 @@
   ;; The last argument to 'dtfn' is a set of fields that should be
   ;; treated as static fields (may only be set once). Dynamic templates
   ;; use ids to set values so you cannot dynamically set an id.
-  {:chat-client-page (dtfn (tnodes "chat-client.html" "hello") #{:id})})
+  {:chat-client-page (dtfn (tnodes "greeting.html" "hello") #{:id})})
 
 ;; Note: this file will not be reloaded automatically when it is changed.
