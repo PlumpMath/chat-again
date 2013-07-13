@@ -1,5 +1,6 @@
 (ns ^:shared chat-client.behavior
     (:require [clojure.string :as string]
+              [io.pedestal.app :as app]
               [io.pedestal.app.messages :as msg]))
 ;; While creating new behavior, write tests to confirm that it is
 ;; correct. For examples of various kinds of tests, see
@@ -8,6 +9,16 @@
 (defn set-value-transform [old-value message]
   (:value message))
 
+(defn send-message-transform [sent-messages message]
+  (conj sent-messages (:message message)))
+
+(defn init-messages [_]
+  [[:node-create [:chat] :map]
+   [:node-create [:chat :messages] :map]
+   [:transform-enable [:chat :messages]
+    :send-message [{msg/topic [:chat :messages] (msg/param :message) {}}]]
+   [:value [:chat :messages] []]])
+
 (def example-app
   ;; There are currently 2 versions (formats) for dataflow
   ;; description: the original version (version 1) and the current
@@ -15,7 +26,13 @@
   ;; description will be assumed to be version 1 and an attempt
   ;; will be made to convert it to version 2.
   {:version 2
-   :transform [[:set-value [:greeting] set-value-transform]]})
+   :transform [[:set-value [:greeting] set-value-transform]
+               [:send-message [:chat :messages] send-message-transform]]
+   :emit [{:init (fn [_] [[:node-create [:greeting] :map]])}
+          [#{[:greeting]} (app/default-emitter [])]
+
+          {:init init-messages}
+          [#{[:chat :messages]} (app/default-emitter [])]]})
 
 ;; Once this behavior works, run the Data UI and record
 ;; rendering data which can be used while working on a custom
