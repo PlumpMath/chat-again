@@ -1,6 +1,7 @@
 (ns ^:shared chat-client.behavior
     (:require [clojure.string :as string]
               [io.pedestal.app :as app]
+              [io.pedestal.app.util.log :as log]
               [io.pedestal.app.util.platform :as platform]
               [io.pedestal.app.messages :as msg]))
 ;; While creating new behavior, write tests to confirm that it is
@@ -18,6 +19,9 @@
                    :date (platform/date)}
            :max-id max-id)))
 
+(defn send-message [{message :message}]
+  (log/info message))
+
 (defn init-messages [_]
   [[:node-create [:chat] :map]
    [:node-create [:chat :messages] :map]
@@ -33,6 +37,8 @@
   {:version 2
    :transform [[:set-value [:greeting] set-value-transform]
                [:send-message [:chat :messages] send-message-transform]]
+   ; will be sent using the fn configured by app/consume-effects
+   :effect #{[{[:chat :messages :*] :message} send-message]}
    :emit [{:init (fn [_] [[:node-create [:greeting] :map]])}
           [#{[:greeting]} (app/default-emitter [])]
 
