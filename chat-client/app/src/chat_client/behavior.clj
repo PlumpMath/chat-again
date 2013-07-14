@@ -19,8 +19,7 @@
   [[:node-create [:chat] :map]
    [:node-create [:chat :messages] :map]
    [:transform-enable [:chat :messages]
-    :send-message [{msg/topic [:chat :messages] (msg/param :message) {}}]]
-   [:value [:chat :messages] []]])
+    :send-message [{msg/topic [:chat :messages] (msg/param :message) {}}]]])
 
 (def example-app
   ;; There are currently 2 versions (formats) for dataflow
