@@ -10,7 +10,10 @@
   (:value message))
 
 (defn send-message-transform [sent-messages message]
-  (conj sent-messages (:message message)))
+  (let [max-id ((fnil inc 0) (:max-id sent-messages))]
+    (assoc sent-messages
+           max-id (:message message)
+           :max-id max-id)))
 
 (defn init-messages [_]
   [[:node-create [:chat] :map]
@@ -32,7 +35,7 @@
           [#{[:greeting]} (app/default-emitter [])]
 
           {:init init-messages}
-          [#{[:chat :messages]} (app/default-emitter [])]]})
+          [#{[:chat :messages :*]} (app/default-emitter [])]]})
 
 ;; Once this behavior works, run the Data UI and record
 ;; rendering data which can be used while working on a custom
