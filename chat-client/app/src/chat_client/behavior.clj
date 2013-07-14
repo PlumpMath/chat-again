@@ -1,6 +1,7 @@
 (ns ^:shared chat-client.behavior
     (:require [clojure.string :as string]
               [io.pedestal.app :as app]
+              [io.pedestal.app.util.platform :as platform]
               [io.pedestal.app.messages :as msg]))
 ;; While creating new behavior, write tests to confirm that it is
 ;; correct. For examples of various kinds of tests, see
@@ -12,7 +13,9 @@
 (defn send-message-transform [sent-messages message]
   (let [max-id ((fnil inc 0) (:max-id sent-messages))]
     (assoc sent-messages
-           max-id (:message message)
+           max-id {:text (:message message)
+                   :from "me@papill0n.org"
+                   :date (platform/date)}
            :max-id max-id)))
 
 (defn init-messages [_]
